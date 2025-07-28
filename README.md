@@ -6,6 +6,7 @@ A scalable and modular **Node.js + Express + MongoDB** backend for an eCommerce 
 
 ## 📁 Project Structure
 
+```
 project-root/
 │
 ├── controllers/ # All route logic
@@ -42,6 +43,7 @@ project-root/
 ├── .env # Environment variables
 ├── .gitignore # Git ignore rules
 └── README.md # You're here!
+```
 
 ---
 
