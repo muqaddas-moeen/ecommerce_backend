@@ -4,4 +4,7 @@ exports.constants = {
   FORBIDDEN: 403,
   NOT_FOUND: 404,
   SERVER_ERROR: 500,
+  CONFLICT_ERROR: 409,
+  CREATED: 201,
+  SUCCESS: 200,
 };

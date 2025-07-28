@@ -1,8 +1,9 @@
 const { Favourite } = require("../models/favourite.model");
+const { constants } = require("../config/constants");
 
 class FavouriteController {
   // Add a new favourite
-  static async addFavourite(req, res) {
+  static async addFavourite(req, res, next) {
     try {
       const userId = req.user._id;
       const productId = req.params.id;
@@ -10,7 +11,7 @@ class FavouriteController {
       // Check if already favourited
       const exists = await Favourite.findOne({ userId, productId });
       if (exists) {
-        return res.status(409).json({
+        return res.status(constants.CONFLICT_ERROR).json({
           success: false,
           message: "This product is already in favourites.",
         });
@@ -19,17 +20,15 @@ class FavouriteController {
       const favourite = new Favourite({ userId, productId });
       const saved = await favourite.save();
 
-      return res.status(201).json({
+      return res.status(constants.CREATED).json({
         success: true,
         message: "Product added to favourites.",
         favourite: saved,
       });
     } catch (error) {
       console.error("Add Favourite Error:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to add favourite.",
-      });
+      res.status(constants.SERVER_ERROR);
+      next(error);
     }
   }
 
@@ -42,10 +41,8 @@ class FavouriteController {
         favourites: favourites,
       });
     } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: "Failed to retrieve favourites.",
-      });
+      res.status(constants.SERVER_ERROR);
+      next(error);
     }
   }
 
@@ -56,16 +53,14 @@ class FavouriteController {
 
       const favourites = await Favourite.find({ userId }).populate("productId");
 
-      return res.status(200).json({
+      return res.status(constants.SUCCESS).json({
         success: true,
         favourites,
       });
     } catch (error) {
       console.error("Get Favourites Error:", error.message);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to retrieve favourites.",
-      });
+      res.status(constants.SERVER_ERROR);
+      next(error);
     }
   }
 
@@ -79,7 +74,7 @@ class FavouriteController {
         .populate("userId");
 
       if (!favourite) {
-        return res.status(404).json({
+        return res.status(constants.NOT_FOUND).json({
           success: false,
           message: "Favourite not found.",
         });
@@ -94,16 +89,14 @@ class FavouriteController {
         updatedAt: favourite.updatedAt,
       };
 
-      return res.status(200).json({
+      return res.status(constants.SUCCESS).json({
         success: true,
         favourite: transformedFavourite,
       });
     } catch (error) {
       console.error("Error retrieving favourite by ID:", error);
-      return res.status(500).json({
-        success: false,
-        message: error.message || "Error retrieving favourite.",
-      });
+      res.status(constants.SERVER_ERROR);
+      next(error);
     }
   }
 
@@ -116,21 +109,19 @@ class FavouriteController {
         { new: true }
       );
       if (!updated) {
-        return res.status(404).json({
+        return res.status(constants.NOT_FOUND).json({
           success: false,
           message: "Favourite not found.",
         });
       }
-      return res.status(200).json({
+      return res.status(constants.SUCCESS).json({
         success: true,
         message: "Favourite updated successfully.",
         favourite: updated,
       });
     } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: "Failed to update favourite.",
-      });
+      res.status(constants.SERVER_ERROR);
+      next(error);
     }
   }
 
@@ -144,20 +135,18 @@ class FavouriteController {
         userId,
       });
       if (!deleted) {
-        return res.status(404).json({
+        return res.status(constants.NOT_FOUND).json({
           success: false,
           message: "Favourite not found.",
         });
       }
-      return res.status(200).json({
+      return res.status(constants.SUCCESS).json({
         success: true,
         message: "Favourite deleted successfully.",
       });
     } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: "Failed to delete favourite.",
-      });
+      res.status(constants.SERVER_ERROR);
+      next(error);
     }
   }
 }

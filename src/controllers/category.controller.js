@@ -10,12 +10,13 @@ class CategoryController {
       const existing = await Category.findOne({ name });
       if (existing) {
         return res.status(constants.VALIDATION_ERROR).json({
+          success: false,
           message: "Category already exists",
         });
       }
 
       const category = await Category.create({ name });
-      res.status(201).json({
+      res.status(constants.CREATED).json({
         success: true,
         category: category,
       });
@@ -30,7 +31,7 @@ class CategoryController {
   static async getAllCategories(req, res, next) {
     try {
       const categories = await Category.find();
-      res.status(200).json({
+      res.status(constants.SUCCESS).json({
         success: true,
         categories: categories,
       });
@@ -49,10 +50,12 @@ class CategoryController {
       const category = await Category.findById(id);
 
       if (!category) {
-        return res.status(404).json({ message: "Category not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Category not found" });
       }
 
-      res.status(200).json({
+      res.status(constants.SUCCESS).json({
         success: true,
         category: category,
       });
@@ -76,10 +79,12 @@ class CategoryController {
       );
 
       if (!updatedCategory) {
-        return res.status(404).json({ message: "Category not found" });
+        return res
+          .status(constants.NOT_FOUND)
+          .json({ success: false, message: "Category not found" });
       }
 
-      res.status(200).json({
+      res.status(constants.success).json({
         success: true,
         category: updatedCategory,
       });
@@ -97,7 +102,9 @@ class CategoryController {
       const deleted = await Category.findByIdAndDelete(id);
 
       if (!deleted) {
-        return res.status(404).json({ message: "Category not found" });
+        return res
+          .status(constants.NOT_FOUND)
+          .json({ success: false, message: "Category not found" });
       }
 
       res

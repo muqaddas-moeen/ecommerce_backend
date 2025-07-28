@@ -4,7 +4,7 @@ const { constants } = require("../config/constants");
 
 class ProductController {
   // Create a new product
-  static async addProduct(req, res) {
+  static async addProduct(req, res, next) {
     try {
       const userId = req.user._id;
 
@@ -25,7 +25,7 @@ class ProductController {
       const existingProductTitle = await Product.findOne({ title });
 
       if (existingProductTitle) {
-        return res.status(409).json({
+        return res.status(constants.CONFLICT_ERROR).json({
           success: false,
           message: "Product already exists with this title.",
           product: existingProductTitle,
@@ -36,7 +36,7 @@ class ProductController {
       const existingProductDescription = await Product.findOne({ description });
 
       if (existingProductDescription) {
-        return res.status(409).json({
+        return res.status(constants.CONFLICT_ERROR).json({
           success: false,
           message: "Product already exists with this description.",
           product: existingProductDescription,
@@ -59,7 +59,7 @@ class ProductController {
 
       const savedProduct = await product.save();
 
-      return res.status(201).json({
+      return res.status(constants.CREATED).json({
         success: true,
         message: "Product created successfully",
         product: savedProduct,
@@ -67,70 +67,62 @@ class ProductController {
     } catch (error) {
       console.error("Add Product Error:", error);
 
-      return res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
+      res.status(constants.SERVER_ERROR);
+      next(error);
     }
   }
 
   // Get all products
-  static async getAllProducts(req, res) {
+  static async getAllProducts(req, res, next) {
     try {
       const products = await Product.find();
 
-      return res.status(200).json({
+      return res.status(constants.SUCCESS).json({
         success: true,
         products: products,
       });
     } catch (error) {
       console.error("Get All Products Error:", error.message);
-      return res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
+      res.status(constants.SERVER_ERROR);
+      next(error);
     }
   }
 
-  static async getAllProductsOfUser(req, res) {
+  static async getAllProductsOfUser(req, res, next) {
     try {
       const userId = req.user._id;
 
       const products = await Product.find({ createdBy: userId });
 
-      return res.status(200).json({
+      return res.status(constants.SUCCESS).json({
         success: true,
         products: products,
       });
     } catch (error) {
       console.error("Get All Products Error:", error.message);
-      return res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
+      res.status(constants.SERVER_ERROR);
+      next(error);
     }
   }
 
-  static async getAllProductsByCategory(req, res) {
+  static async getAllProductsByCategory(req, res, next) {
     try {
       const categoryId = req.params.id;
       const products = await Product.find({ categoryId });
 
-      return res.status(200).json({
+      return res.status(constants.SUCCESS).json({
         success: true,
         products: products,
       });
     } catch (error) {
       console.error("Get All Products Error:", error.message);
-      return res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
+      res.status(constants.SERVER_ERROR);
+      next(error);
     }
   }
 
   // Get a single product by ID
-  static async getProductById(req, res) {
+  static async getProductById(req, res, next) {
     try {
       const { id } = req.params;
 
@@ -140,27 +132,25 @@ class ProductController {
       );
 
       if (!product) {
-        return res.status(404).json({
+        return res.status(constants.NOT_FOUND).json({
           success: false,
           message: "Product not found",
         });
       }
 
-      return res.status(200).json({
+      return res.status(constants.SUCCESS).json({
         success: true,
         product: product,
       });
     } catch (error) {
       console.error("Get Product By ID Error:", error.message);
-      return res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
+      res.status(constants.SERVER_ERROR);
+      next(error);
     }
   }
 
   // Update a product by ID
-  static async updateProduct(req, res) {
+  static async updateProduct(req, res, next) {
     try {
       const { id } = req.params;
       const updates = req.body;
@@ -171,50 +161,46 @@ class ProductController {
       });
 
       if (!updatedProduct) {
-        return res.status(404).json({
+        return res.status(constants.NOT_FOUND).json({
           success: false,
           message: "Product not found",
         });
       }
 
-      return res.status(200).json({
+      return res.status(constants.SUCCESS).json({
         success: true,
         message: "Product updated successfully",
         product: updatedProduct,
       });
     } catch (error) {
       console.error("Update Product Error:", error.message);
-      return res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
+      res.status(constants.SERVER_ERROR);
+      next(error);
     }
   }
 
   // Delete a product by ID
-  static async deleteProduct(req, res) {
+  static async deleteProduct(req, res, next) {
     try {
       const { id } = req.params;
 
       const deletedProduct = await Product.findByIdAndDelete(id);
 
       if (!deletedProduct) {
-        return res.status(404).json({
+        return res.status(constants.NOT_FOUND).json({
           success: false,
           message: "Product not found",
         });
       }
 
-      return res.status(200).json({
+      return res.status(constants.SUCCESS).json({
         success: true,
         message: "Product deleted successfully",
       });
     } catch (error) {
       console.error("Delete Product Error:", error.message);
-      return res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
+      res.status(constants.SERVER_ERROR);
+      next(error);
     }
   }
 }

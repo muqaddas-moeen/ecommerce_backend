@@ -7,7 +7,7 @@ class UserController {
   static async getUsers(req, res, next) {
     try {
       const users = await User.find();
-      res.json({
+      res.status(constants.SUCCESS).json({
         success: true,
         users: users,
       });
@@ -22,13 +22,15 @@ class UserController {
     try {
       const user = await User.findById(req.params.id);
       if (!user) {
-        res.status(constants.NOT_FOUND);
-        throw new Error("User not found");
+        res.status(constants.NOT_FOUND).json({
+          success: false,
+          message: "User not found",
+        });
       }
 
       const products = await Product.find({ createdBy: user._id });
 
-      res.json({
+      res.status(constants.SUCCESS).json({
         success: true,
         user,
         products,
@@ -43,10 +45,12 @@ class UserController {
     try {
       const user = await User.findById(req.user._id);
       if (!user) {
-        res.status(constants.NOT_FOUND);
-        throw new Error("User not found");
+        res.status(constants.NOT_FOUND).json({
+          success: false,
+          message: "User not found",
+        });
       }
-      res.json({
+      res.status(constants.SUCCESS).json({
         success: true,
         user: user,
       });
@@ -60,7 +64,7 @@ class UserController {
     try {
       const { name, email, password } = req.body;
       const user = await User.create({ name, email, password });
-      res.status(201).json({
+      res.status(constants.CREATED).json({
         success: true,
         user: user,
       });
@@ -78,10 +82,12 @@ class UserController {
         new: true,
       });
       if (!updatedUser) {
-        res.status(constants.NOT_FOUND);
-        throw new Error("User not found");
+        res.status(constants.NOT_FOUND).json({
+          success: false,
+          message: "User not found",
+        });
       }
-      res.json({
+      res.status(constants.SUCCESS).json({
         success: true,
         user: updatedUser,
       });
@@ -95,10 +101,14 @@ class UserController {
     try {
       const deletedUser = await User.findByIdAndDelete(req.params.id);
       if (!deletedUser) {
-        res.status(constants.NOT_FOUND);
-        throw new Error("User not found");
+        res.status(constants.NOT_FOUND).json({
+          success: false,
+          message: "User not found",
+        });
       }
-      res.json({ success: true, message: "User deleted successfully" });
+      res
+        .status(constants.SUCCESS)
+        .json({ success: true, message: "User deleted successfully" });
     } catch (err) {
       next(err);
     }

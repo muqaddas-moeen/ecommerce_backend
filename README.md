@@ -49,7 +49,7 @@ project-root/
 
 ## 🚀 Features
 
-- 🧑‍💼 **User Authentication & JWT Authorization**
+- 🧑‍💼 **User Authentication**
 - 🔐 **Password Hashing with bcrypt**
 - 📦 **Product Management (CRUD)**
 - 📂 **Category Management**
