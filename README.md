@@ -69,7 +69,8 @@ Create a `.env` file in the root directory with the following structure:
 ```env
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/ecommerce
-JWT_SECRET=your_jwt_secret
+JWT_SECRET=your_very_secure_jwt_secret
+JWT_EXPIRES_IN=3d
 
 ```
 
